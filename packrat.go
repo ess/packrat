@@ -1,6 +1,7 @@
 package packrat
 
 import (
+	"fmt"
 	"html/template"
 )
 
