@@ -6,9 +6,8 @@ import (
 	"github.com/gobuffalo/packr"
 )
 
-func ParseBox(name string) (*template.Template, error) {
+func ParseFiles(box packr.Box) (*template.Template, error) {
 	var t *template.Template
-	box := packr.NewBox(name)
 
 	for _, file := range box.List() {
 		if t == nil {
