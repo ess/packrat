@@ -5,14 +5,25 @@ import (
 )
 
 type storage interface {
-	List() []string
-	String(string) string
+	MustString(string) (string, error)
 }
 
-func ParseFiles(box storage) (*template.Template, error) {
+type Packrat struct {
+	box storage
+}
+
+func New(box storage) *Packrat {
+	return &Packrat{box: box}
+}
+
+func (p *Packrat) ParseFiles(filenames ...string) (*template.Template, error) {
 	var t *template.Template
 
-	for _, file := range box.List() {
+	if len(filenames) == 0 {
+		return nil, fmt.Errorf("packrat: no files named in call to ParseFiles")
+	}
+
+	for _, file := range filenames {
 		if t == nil {
 			t = template.New(file)
 		}
@@ -21,7 +32,12 @@ func ParseFiles(box storage) (*template.Template, error) {
 			t = t.New(file)
 		}
 
-		if _, err := t.Parse(box.String(file)); err != nil {
+		content, err := p.box.MustString(file)
+		if err != nil {
+			return nil, err
+		}
+
+		if _, err := t.Parse(content); err != nil {
 			return nil, err
 		}
 	}
