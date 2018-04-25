@@ -2,11 +2,14 @@ package packrat
 
 import (
 	"html/template"
-
-	"github.com/gobuffalo/packr"
 )
 
-func ParseFiles(box packr.Box) (*template.Template, error) {
+type storage interface {
+	List() []string
+	String(string) string
+}
+
+func ParseFiles(box storage) (*template.Template, error) {
 	var t *template.Template
 
 	for _, file := range box.List() {
